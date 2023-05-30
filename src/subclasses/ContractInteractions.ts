@@ -316,13 +316,26 @@ class ContractInteractions {
     pool: PoolSymbol,
     amount: BigNumber,
     signer: ethers.Signer
-  ): Promise<ContractReceipt> => {
+  ): Promise<{ address: string; amount: BigNumber }[]> => {
     const poolToken = this.getPoolContract(pool, signer);
 
-    const redeemTxn: ContractTransaction = await poolToken.redeemAuto(amount, {
-      gasLimit: GAS_LIMIT,
-    });
-    return await redeemTxn.wait();
+    const redeemReceipt = await (
+      await poolToken.redeemAuto2(amount, { gasLimit: GAS_LIMIT })
+    ).wait();
+
+    if (!redeemReceipt.events) {
+      throw new Error("No events to get tco2 addresses and amounts from");
+    }
+
+    return redeemReceipt.events
+      .filter((event) => {
+        return (
+          event.event == "Redeemed" && event.args?.erc20 && event.args?.amount
+        );
+      })
+      .map((event) => {
+        return { address: event.args?.erc20, amount: event.args?.amount };
+      });
   };
 
   /**

@@ -95,7 +95,8 @@ export default class ToucanClient {
    *
    * @description retires/burns an amount of TCO2s (each represents 1 ton of CO2) to achieve offset
    * @param amount amount of TCO2 to retire
-   * @param tco2Address address of the TCO2 token to retire* @returns retirement transaction
+   * @param tco2Address address of the TCO2 token to retire
+   * @returns retirement transaction
    */
   retire = async (
     amount: BigNumber,
@@ -115,7 +116,8 @@ export default class ToucanClient {
    * @param beneficiaryName name of the beneficiary
    * @param retirementMessage retirement message
    * @param amount amount of TCO2 to retire
-   * @param tco2Address address of the TCO2 token to retire* @returns retirement transaction
+   * @param tco2Address address of the TCO2 token to retire
+   * @returns retirement transaction
    */
   retireAndMintCertificate = async (
     retirementEntityName: string,
@@ -145,7 +147,8 @@ export default class ToucanClient {
    * @notice requires approval from the address you're trying to retire from
    * @param amount amount of TCO2 to retire
    * @param address address of the account to retire from
-   * @param tco2Address address of the TCO2 token to retire* @returns retirement transaction
+   * @param tco2Address address of the TCO2 token to retire
+   * @returns retirement transaction
    */
   retireFrom = async (
     amount: BigNumber,
@@ -183,7 +186,7 @@ export default class ToucanClient {
    *
    * @description gets the attributes of the project represented by the TCO2
    * @param tco2Address address of the TCO2 token
-   * @returns an array of attributes
+   * @returns an array of attributes including vintage and project details.
    */
   getAttributes = async (tco2Address: string) => {
     const signerOrProvider = this.signer ? this.signer : this.provider;
@@ -219,10 +222,11 @@ export default class ToucanClient {
 
   /**
    *
-   * @description deposits TCO2s in the pool which mints a pool token for the user
-   * @param pool symbol of the pool (token) to use
+   * @description deposits TCO2 tokens from a user's address into a Toucan pool and mints a pool token for the user
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of TCO2s to deposit
-   * @param tco2Address address of the TCO2 token to deposit* @returns deposit transaction
+   * @param tco2Address address of the TCO2 token to deposit
+   * @returns deposit transaction
    */
   depositTCO2 = async (
     pool: PoolSymbol,
@@ -242,9 +246,9 @@ export default class ToucanClient {
 
   /**
    *
-   * @description checks if TCO2 is eligible for pool
-   * @param pool symbol of the pool (token) to use
-   * @param tco2 address of TCO2 to deposit
+   * @description checks if TCO2 is eligible for a pool
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param tco2 address of TCO2 token to deposit
    * @returns boolean
    */
   checkEligible = async (pool: PoolSymbol, tco2: string): Promise<boolean> => {
@@ -261,15 +265,15 @@ export default class ToucanClient {
   /**
    *
    * @description calculates the fees to selectively redeem pool tokens for TCO2s
-   * @param pool symbol of the pool (token) to use
-   * @param tco2s array of TCO2 contract addresses
-   * @param amounts array of amounts to redeem for each tco2s
-   * @notice tco2s must match amounts; amounts[0] is the amount of tco2[0] token to redeem for
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param tco2Addresses array of TCO2 contract addresses
+   * @param amounts array of amounts to redeem for each TCO2s
+   * @notice TCO2s must match the amounts; amounts[0] is the amount of tco2Addresses[0] token to redeem for
    * @returns amount (BigNumber) of fees it will cost to redeem
    */
   calculateRedeemFees = async (
     pool: PoolSymbol,
-    tco2s: string[],
+    tco2Addresses: string[],
     amounts: BigNumber[]
   ): Promise<BigNumber> => {
     const signerOrProvider = this.signer ? this.signer : this.provider;
@@ -277,7 +281,7 @@ export default class ToucanClient {
 
     return this.contractInteractions.calculateRedeemFees(
       pool,
-      tco2s,
+      tco2Addresses,
       amounts,
       signerOrProvider
     );
@@ -286,33 +290,38 @@ export default class ToucanClient {
   /**
    *
    * @description selectively redeems pool tokens for TCO2s
-   * @param pool symbol of the pool (token) to use
-   * @param tco2s array of TCO2 contract addresses
-   * @param amounts array of amounts to redeem for each tco2s
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param tco2Addresses array of TCO2 contract addresses
+   * @param amounts array of amounts to redeem for each TCO2 token
    * @returns redeem transaction
    */
   redeemMany = async (
     pool: PoolSymbol,
-    tco2s: string[],
+    tco2Addresses: string[],
     amounts: BigNumber[]
   ): Promise<ContractReceipt> => {
     if (!this.signer) throw new Error("No signer set");
     const signer = this.signer;
 
-    return this.contractInteractions.redeemMany(pool, tco2s, amounts, signer);
+    return this.contractInteractions.redeemMany(
+      pool,
+      tco2Addresses,
+      amounts,
+      signer
+    );
   };
 
   /**
    *
    * @description automatically redeems pool tokens for TCO2s
-   * @param pool symbol of the pool (token) to use
-   * @param amount amount to redeem
-   * @returns redeem transaction
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param amount amount of pool tokens to redeem
+   * @returns array containing TCO2 addresses (string) and amounts (BigNumber)
    */
   redeemAuto = async (
     pool: PoolSymbol,
     amount: BigNumber
-  ): Promise<ContractReceipt> => {
+  ): Promise<{ address: string; amount: BigNumber }[]> => {
     if (!this.signer) throw new Error("No signer set");
     const signer = this.signer;
 
@@ -322,8 +331,8 @@ export default class ToucanClient {
   /**
    *
    * @description automatically redeems pool tokens for TCO2s
-   * @param pool symbol of the pool (token) to use
-   * @param amount amount to redeem
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param amount amount of pool tokens to redeem
    * @returns array containing tco2 addresses (string) and amounts (BigNumber)
    */
   redeemAuto2 = async (
@@ -352,7 +361,7 @@ export default class ToucanClient {
   /**
    *
    * @description gets an array of scored TCO2s; scoredTCO2s[0] is lowest ranked
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @returns array of TCO2 addresses by rank
    */
   getScoredTCO2s = async (pool: PoolSymbol): Promise<string[]> => {
@@ -391,7 +400,7 @@ export default class ToucanClient {
    *
    * @description allows user to retire carbon using carbon pool tokens from his wallet
    * @notice this method may take up to even 1 minute to give a result
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to offset* @returns offset transaction
    */
   autoOffsetUsingPoolToken = async (
@@ -412,7 +421,7 @@ export default class ToucanClient {
    *
    * @description swaps given token for carbon pool tokens and uses them to retire carbon
    * @notice this method may take up to even 1 minute to give a result
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to offset
    * @param swapToken portal for the token to swap into pool tokens (only accepts WETH, WMATIC and USDC)* @returns offset transaction
    */
@@ -436,7 +445,7 @@ export default class ToucanClient {
    *
    * @description swaps ETH for carbon pool tokens and uses them to retire carbon
    * @notice this method may take up to even 1 minute to give a result
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to offset* @returns offset transaction
    */
   autoOffsetUsingETH = async (
@@ -452,7 +461,7 @@ export default class ToucanClient {
   /**
    *
    * @description calculates the needed amount of tokens to send to offset
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to calculate for
    * @param swapToken contract of the token to use in swap
    * @returns amount (BigNumber) of swapToken needed to deposit
@@ -476,7 +485,7 @@ export default class ToucanClient {
   /**
    *
    * @description calculates the needed amount of ETH to send to offset; ETH = native currency of network you are on
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to calculate for
    * @returns amount (BigNumber) of ETH needed to deposit; ETH = native currency of network you are on
    */
@@ -502,9 +511,9 @@ export default class ToucanClient {
    *
    * @description fetches the batches of a user
    * @param walletAddress address of user to query for
-   * @returns an array of BatchTokens (they contain different properties of the Batch)
+   * @returns an array of BatchTokens (containing different properties of the Batch)
    */
-  fetchUserBatches: UserBatchesMethod = async (walletAddress) => {
+  fetchUserBatches: UserBatchesMethod = async (walletAddress: string) => {
     return this.subgraphInteractions.fetchUserBatches(walletAddress);
   };
 
@@ -514,19 +523,19 @@ export default class ToucanClient {
 
   /**
    *
-   * @description fetches properties of a TCO2
-   * @param id id of the TCO2 to query for; the id happens to be the same as the address e.g.: "0x004090eef602e024b2a6cb7f0c1edda992382994"
-   * @returns a TCO2Detail object with properties of the TCO2 (name, address, etc)
+   * @description fetches the properties of a TCO2 token by its ID
+   * @param id ID of the TCO2 to query for; the id happens to be the same as the address e.g.: "0x004090eef602e024b2a6cb7f0c1edda992382994"
+   * @returns a TCO2 Detail object with properties of the TCO2 (name, address, etc)
    */
-  fetchTCO2TokenById: TCO2TokenByIdMethod = async (id) => {
+  fetchTCO2TokenById: TCO2TokenByIdMethod = async (id: string) => {
     return this.subgraphInteractions.fetchTCO2TokenById(id);
   };
 
   /**
    *
-   * @description fetches properties of a TCO2
-   * @param symbol full symbol of the TCO2 to query for e.g.: "TCO2-VCS-1718-2013"
-   * @returns a TCO2Detail object with properties of the TCO2 (name, address, etc)
+   * @description fetches properties of a TCO2 token by its full symbol
+   * @param symbol full symbol of the TCO2 to query for e.g., "TCO2-VCS-1718-2013"
+   * @returns a TCO2 Detail object with properties of the TCO2 (name, address, etc)
    */
   fetchTCO2TokenByFullSymbol: TCO2TokenByFullSymbolMethod = async (
     symbol: string
@@ -536,8 +545,8 @@ export default class ToucanClient {
 
   /**
    *
-   * @description fetches TCO2Details of all TCO2s
-   * @returns an array of TCO2Detail objects with properties of the TCO2s (name, address, etc)
+   * @description fetches TCO2 Details of all TCO2s
+   * @returns an array of TCO2 Detail objects with properties of the TCO2s (name, address, etc)
    */
   fetchAllTCO2Tokens: AllTCO2TokensMethod = async () => {
     return this.subgraphInteractions.fetchAllTCO2Tokens();
@@ -569,9 +578,9 @@ export default class ToucanClient {
    * @returns an array of objects containing properties of the retirements like id, creationTx, amount and more
    */
   fetchUserRetirements: UserRetirementsMethod = async (
-    walletAddress,
-    first = 100,
-    skip = 0
+    walletAddress: string,
+    first: number = 100,
+    skip: number = 0
   ) => {
     return this.subgraphInteractions.fetchUserRetirements(
       walletAddress,
@@ -587,29 +596,33 @@ export default class ToucanClient {
   /**
    *
    * @description fetches redeems of a given pool
-   * @param pool symbol of pool to fetch for
+   * @param pool symbol of pool token to fetch the price for e.g., "NCT"
    * @param first how many redeems you want fetched; defaults to 100
    * @param skip how many (if any) redeems you want skipped; defaults to 0
    * @returns an array of objects with properties of the redeems like id, amount, timestamp and more
    */
-  fetchRedeems: RedeemsMethod = async (pool, first = 100, skip = 0) => {
+  fetchRedeems: RedeemsMethod = async (
+    pool: PoolSymbol,
+    first: number = 100,
+    skip: number = 0
+  ) => {
     return this.subgraphInteractions.fetchRedeems(pool, first, skip);
   };
 
   /**
    *
-   * @description fetches redeems of a given pool and user
+   * @description fetches redeems of a given pool for a specific user
    * @param walletAddress address of the user/wallet to query for
-   * @param pool symbol of pool to fetch for
+   * @param pool symbol of pool to fetch the user redeems for e.g., "NCT"
    * @param first how many redeems you want fetched; defaults to 100
    * @param skip how many (if any) redeems you want skipped; defaults to 0
    * @returns an array of objects with properties of the redeems like id, amount, timestamp and more
    */
   fetchUserRedeems: UserRedeemsMethod = async (
-    walletAddress,
-    pool,
-    first = 100,
-    skip = 0
+    walletAddress: string,
+    pool: PoolSymbol,
+    first: number = 100,
+    skip: number = 0
   ) => {
     return this.subgraphInteractions.fetchUserRedeems(
       walletAddress,
@@ -626,15 +639,15 @@ export default class ToucanClient {
   /**
    *
    * @description fetches TCO2 tokens that are part of the given pool
-   * @param pool symbol of the pool to fetch for
+   * @param pool symbol of the pool to fetch for e.g., "NCT"
    * @param first how many TCO2 tokens you want fetched; defaults to 1000
    * @param skip how many (if any) retirements you want skipped; defaults to 0
    * @returns an array of objects representing TCO2 tokens and containing properties like name, amount, methodology and more
    */
   fetchPoolContents: PoolContentsMethod = async (
-    pool,
-    first = 1000,
-    skip = 0
+    pool: PoolSymbol,
+    first: number = 1000,
+    skip: number = 0
   ) => {
     return this.subgraphInteractions.fetchPoolContents(pool, first, skip);
   };
@@ -646,10 +659,10 @@ export default class ToucanClient {
   /**
    *
    * @description fetches a project by its id
-   * @param id id of the project to fetch; e.g.: "10"
-   * @returns an object with properties of the Project like projectId, region, standard and more
+   * @param id id of the project to fetch; e.g., "10"
+   * @returns an object with properties of the project like projectId, region, standard and more
    */
-  fetchProjectById: ProjectByIdMethod = async (id) => {
+  fetchProjectById: ProjectByIdMethod = async (id: string) => {
     return this.subgraphInteractions.fetchProjectById(id);
   };
 
@@ -683,10 +696,15 @@ export default class ToucanClient {
 
   // --------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------
-  //  Price / Sushiswap related methods
+  //  Price / DEX (Ubeswap, Sushiswap) related methods
   // --------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------
 
+  /**
+   *
+   * @description fetch  pool token price form a Decentralized Exchange (DEX)
+   * @returns an an Object with the price, url, liquidityUSD and volumeUSD
+   */
   fetchTokenPriceOnDex = async (
     pool: PoolSymbol
   ): Promise<{
@@ -705,7 +723,7 @@ export default class ToucanClient {
   /**
    *
    * @description gets the contract of a pool token based on the symbol
-   * @param pool symbol of the pool (token) to use
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @returns a ethers.contract to interact with the pool
    */
   public getPoolAddress = (pool: PoolSymbol): string => {
@@ -716,7 +734,7 @@ export default class ToucanClient {
    *
    * @dev
    * @description gets the contract of a pool token based on the symbol
-   * @param PoolSymbol symbol of the pool (token) to use
+   * @param PoolSymbol symbol of the pool (token) to use e.g., "NCT"
    * @returns a ethers.contract to interact with the pool
    */
   public getPoolContract = (pool: PoolSymbol): IToucanPoolToken => {
