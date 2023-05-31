@@ -410,22 +410,18 @@ export default class ToucanClient {
     if (!this.signer) throw new Error("No signer set");
     const signer = this.signer;
 
-    return this.contractInteractions.autoOffsetUsingPoolToken(
-      pool,
-      amount,
-      signer
-    );
+    return this.contractInteractions.autoOffsetPoolToken(pool, amount, signer);
   };
 
   /**
    *
-   * @description swaps given token for carbon pool tokens and uses them to retire carbon
-   * @notice this method may take up to even 1 minute to give a result
+   * @description retire a specified amount of  carbon credits using the lowest quality (oldest) TCO2 tokens available from the specified Toucan token pool by sending a native token e.g. CELO.
+   * @notice this method needs two different actions signed and may take up to even 1 minute to give a result
    * @param pool symbol of the pool (token) to use e.g., "NCT"
    * @param amount amount of CO2 tons to offset
    * @param swapToken portal for the token to swap into pool tokens (only accepts WETH, WMATIC and USDC)* @returns offset transaction
    */
-  autoOffsetUsingSwapToken = async (
+  autoOffsetExactOutToken = async (
     pool: PoolSymbol,
     amount: BigNumber,
     swapToken: Contract
@@ -433,7 +429,31 @@ export default class ToucanClient {
     if (!this.signer) throw new Error("No signer set");
     const signer = this.signer;
 
-    return this.contractInteractions.autoOffsetUsingSwapToken(
+    return this.contractInteractions.autoOffsetExactOutToken(
+      pool,
+      amount,
+      swapToken,
+      signer
+    );
+  };
+
+  /**
+   *
+   * @description retire a specified amount of  carbon credits using the lowest quality (oldest) TCO2 tokens available from the specified Toucan token pool by sending a native token e.g. CELO.
+   * @notice this method needs two different actions signed and may take up to even 1 minute to give a result
+   * @param pool symbol of the pool (token) to use e.g., "NCT"
+   * @param amount amount of CO2 tons to offset
+   * @param swapToken portal for the token to swap into pool tokens (only accepts WETH, WMATIC and USDC)* @returns offset transaction
+   */
+  autoOffsetExactInToken = async (
+    pool: PoolSymbol,
+    amount: BigNumber,
+    swapToken: Contract
+  ): Promise<ContractReceipt> => {
+    if (!this.signer) throw new Error("No signer set");
+    const signer = this.signer;
+
+    return this.contractInteractions.autoOffsetExactInToken(
       pool,
       amount,
       swapToken,

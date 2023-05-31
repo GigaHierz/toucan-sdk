@@ -35,6 +35,7 @@ import { GAS_LIMIT } from "../utils";
 import {
   poolTokenABI,
   tco2ABI,
+  offsetHelperABI,
   toucanContractRegistryABI,
 } from "../utils/ABIs";
 import addresses, { IfcOneNetworksAddresses } from "../utils/addresses";
@@ -437,7 +438,7 @@ class ContractInteractions {
    * @param signer this being a write transaction, we need a signer
    * @returns offset transaction
    */
-  autoOffsetUsingPoolToken = async (
+  autoOffsetPoolToken = async (
     pool: PoolSymbol,
     amount: BigNumber,
     signer: ethers.Signer
@@ -453,7 +454,7 @@ class ContractInteractions {
     const offsetHelper = this.getOffsetHelperContract(signer);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetUsingPoolToken(this.addresses.nct, amount, {
+      await offsetHelper.autoOffsetPoolToken(this.addresses.nct, amount, {
         gasLimit: GAS_LIMIT,
       });
     return await offsetTxn.wait();
@@ -461,15 +462,15 @@ class ContractInteractions {
 
   /**
    *
-   * @description swaps given token for carbon pool tokens and uses them to retire carbon
-   * @notice this method may take up to even 1 minute to give a result
+   * @description retire a specified amount of  carbon credits using the lowest quality (oldest) TCO2 tokens available from the specified Toucan token pool by sending a native token e.g. CELO.
+   * @notice this method needs two different actions signed and may take up to even 1 minute to give a result
    * @param pool symbol of the pool (token) to use
    * @param amount amount of CO2 tons to offset
    * @param swapToken portal for the token to swap into pool tokens (only accepts WETH, WMATIC and USDC)
    * @param signer this being a write transaction, we need a signer
    * @returns offset transaction
    */
-  autoOffsetUsingSwapToken = async (
+  autoOffsetExactOutToken = async (
     pool: PoolSymbol,
     amount: BigNumber,
     swapToken: Contract,
@@ -500,14 +501,50 @@ class ContractInteractions {
 
   /**
    *
-   * @description swaps ETH for carbon pool tokens and uses them to retire carbon
+   * @description retire  carbon credits using the lowest quality (oldest) TCO2 tokens available from the specified Toucan token pool by sending a native token e.g. CELO.
+   * @notice this method needs two different actions signed and may take up to even 1 minute to give a result
+   * @param pool symbol of the pool (token) to use
+   * @param amount the amount of ERC20 token to swap into Toucan pool token. Full amount will be used for offsetting.
+   * @param swapToken portal for the token to swap into pool tokens (only accepts WETH, WMATIC and USDC)
+   * @param signer this being a write transaction, we need a signer
+   * @returns offset transaction
+   */
+  autoOffsetExactInToken = async (
+    pool: PoolSymbol,
+    amount: BigNumber,
+    swapToken: Contract,
+    signer: ethers.Signer
+  ): Promise<ContractReceipt> => {
+    const poolAddress = this.getPoolAddress(pool);
+    const offsetHelper = this.getOffsetHelperContract(signer);
+
+    const approveTxn: ContractTransaction = await swapToken.approve(
+      this.addresses.offsetHelper,
+      amount
+    );
+    await approveTxn.wait();
+
+    const offsetTxn: ContractTransaction =
+      await offsetHelper.autoOffsetExactInToken(
+        swapToken.address,
+        amount,
+        poolAddress,
+        { gasLimit: GAS_LIMIT }
+      );
+    return await offsetTxn.wait();
+  };
+
+  /**
+   *
+   * @description Retire a specified amount of  carbon credits using the lowest quality (oldest) TCO2 tokens available from the specified Toucan token pool by sending a native token e.g. CELO.
+   * @dev Use `calculateNeededETHAmount()` first in order to find out how much  of the native token e.g. CELO is required to retire the specified quantity of TCO2. If the user sends much native token e.g. CELO, the leftover amount will be sent back to the user.
    * @notice this method may take up to even 1 minute to give a result
    * @param pool symbol of the pool (token) to use
    * @param amount amount of CO2 tons to offset
    * @param signer this being a write transaction, we need a signer
    * @returns offset transaction
    */
-  autoOffsetUsingETH = async (
+  autoOffsetExactOutETH = async (
     pool: PoolSymbol,
     amount: BigNumber,
     signer: ethers.Signer
@@ -516,9 +553,34 @@ class ContractInteractions {
     const poolAddress = this.getPoolAddress(pool);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetUsingETH(poolAddress, amount, {
+      await offsetHelper.autoOffsetExactOutETH(poolAddress, amount, {
         gasLimit: GAS_LIMIT,
         value: await offsetHelper.calculateNeededETHAmount(poolAddress, amount),
+      });
+    return await offsetTxn.wait();
+  };
+
+  /**
+   *
+   * @description swaps ETH for carbon pool tokens and uses them to retire carbon
+   * @notice this method may take up to even 1 minute to give a result
+   * @param pool symbol of the pool (token) to use
+   * @param amount the amount of native tokens e.g., CELO to swap into Toucan pool token. Full amount will be used for offsetting.
+   * @param signer this being a write transaction, we need a signer
+   * @returns offset transaction
+   */
+  autoOffsetExactInETH = async (
+    pool: PoolSymbol,
+    amount: BigNumber,
+    signer: ethers.Signer
+  ): Promise<ContractReceipt> => {
+    const offsetHelper = this.getOffsetHelperContract(signer);
+    const poolAddress = this.getPoolAddress(pool);
+
+    const offsetTxn: ContractTransaction =
+      await offsetHelper.autoOffsetExactInETH(poolAddress, amount, {
+        gasLimit: GAS_LIMIT,
+        value: amount,
       });
     return await offsetTxn.wait();
   };
@@ -650,6 +712,12 @@ class ContractInteractions {
     signerOrProvider: ethers.Signer | ethers.providers.Provider
   ): OffsetHelper => {
     throw new Error("OffsetHelper is not supported yet");
+    const OffsetHelper = new ethers.Contract(
+      this.addresses.offsetHelper,
+      offsetHelperABI,
+      signerOrProvider
+    ) as OffsetHelper;
+    return OffsetHelper;
   };
 }
 

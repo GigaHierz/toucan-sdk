@@ -2093,6 +2093,93 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+    ],
+    name: "autoOffsetExactInETH",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "tco2s",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amounts",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_fromToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amountToSwap",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+    ],
+    name: "autoOffsetExactInToken",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "tco2s",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amounts",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amountToOffset",
+        type: "uint256",
+      },
+    ],
+    name: "autoOffsetExactOutETH",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "tco2s",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amounts",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_depositedToken",
         type: "address",
       },
@@ -2444,6 +2531,19 @@ export const offsetHelperABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "sushiRouterAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -2543,19 +2643,6 @@ export const offsetHelperABI = [
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "ubeswapRouterAddress",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
