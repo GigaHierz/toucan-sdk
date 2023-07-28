@@ -2009,14 +2009,19 @@ export const offsetHelperABI = [
   {
     inputs: [
       {
+        internalType: "address[]",
+        name: "_poolAddresses",
+        type: "address[]",
+      },
+      {
         internalType: "string[]",
-        name: "_eligibleTokenSymbols",
+        name: "_tokenSymbolsForPaths",
         type: "string[]",
       },
       {
-        internalType: "address[]",
-        name: "_eligibleTokenAddresses",
-        type: "address[]",
+        internalType: "address[][]",
+        name: "_paths",
+        type: "address[][]",
       },
     ],
     stateMutability: "nonpayable",
@@ -2060,7 +2065,7 @@ export const offsetHelperABI = [
       {
         indexed: false,
         internalType: "address",
-        name: "who",
+        name: "sender",
         type: "address",
       },
       {
@@ -2092,6 +2097,42 @@ export const offsetHelperABI = [
   {
     inputs: [
       {
+        internalType: "string",
+        name: "_tokenSymbol",
+        type: "string",
+      },
+      {
+        internalType: "address[]",
+        name: "_path",
+        type: "address[]",
+      },
+    ],
+    name: "addPath",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+    ],
+    name: "addPoolToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_fromToken",
+        type: "address",
+      },
+      {
         internalType: "address",
         name: "_poolToken",
         type: "address",
@@ -2121,14 +2162,14 @@ export const offsetHelperABI = [
         type: "address",
       },
       {
-        internalType: "uint256",
-        name: "_amountToSwap",
-        type: "uint256",
-      },
-      {
         internalType: "address",
         name: "_poolToken",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amountToSwap",
+        type: "uint256",
       },
     ],
     name: "autoOffsetExactInToken",
@@ -2149,6 +2190,11 @@ export const offsetHelperABI = [
   },
   {
     inputs: [
+      {
+        internalType: "address",
+        name: "_fromToken",
+        type: "address",
+      },
       {
         internalType: "address",
         name: "_poolToken",
@@ -2180,7 +2226,7 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
-        name: "_depositedToken",
+        name: "_fromToken",
         type: "address",
       },
       {
@@ -2313,14 +2359,19 @@ export const offsetHelperABI = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_fromMaticAmount",
-        type: "uint256",
+        internalType: "address",
+        name: "_fromToken",
+        type: "address",
       },
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_poolToken",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_fromTokenAmount",
+        type: "uint256",
       },
     ],
     name: "calculateExpectedPoolTokenForETH",
@@ -2342,14 +2393,14 @@ export const offsetHelperABI = [
         type: "address",
       },
       {
+        internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+      {
         internalType: "uint256",
         name: "_fromAmount",
         type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_toToken",
-        type: "address",
       },
     ],
     name: "calculateExpectedPoolTokenForToken",
@@ -2367,7 +2418,12 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_fromToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_poolToken",
         type: "address",
       },
       {
@@ -2396,7 +2452,7 @@ export const offsetHelperABI = [
       },
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_poolToken",
         type: "address",
       },
       {
@@ -2432,19 +2488,6 @@ export const offsetHelperABI = [
   {
     inputs: [
       {
-        internalType: "string",
-        name: "_tokenSymbol",
-        type: "string",
-      },
-    ],
-    name: "deleteEligibleTokenAddress",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "_erc20Addr",
         type: "address",
@@ -2461,14 +2504,56 @@ export const offsetHelperABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "dexRouterAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "eligibleSwapPaths",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "string",
         name: "",
         type: "string",
       },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    name: "eligibleTokenAddresses",
+    name: "eligibleSwapPathsBySymbol",
     outputs: [
       {
         internalType: "address",
@@ -2493,8 +2578,14 @@ export const offsetHelperABI = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "renounceOwnership",
+    inputs: [
+      {
+        internalType: "string",
+        name: "_tokenSymbol",
+        type: "string",
+      },
+    ],
+    name: "removePath",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -2502,17 +2593,19 @@ export const offsetHelperABI = [
   {
     inputs: [
       {
-        internalType: "string",
-        name: "_tokenSymbol",
-        type: "string",
-      },
-      {
         internalType: "address",
-        name: "_address",
+        name: "_poolToken",
         type: "address",
       },
     ],
-    name: "setEligibleTokenAddress",
+    name: "removePoolToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -2532,12 +2625,25 @@ export const offsetHelperABI = [
   },
   {
     inputs: [],
-    name: "sushiRouterAddress",
+    name: "showEligiblePoolTokens",
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: "address[]",
+        name: "_poolTokens",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "showEligibleTokens",
+    outputs: [
+      {
+        internalType: "string[]",
+        name: "_tokens",
+        type: "string[]",
       },
     ],
     stateMutability: "view",
@@ -2547,7 +2653,12 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_fromToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_poolToken",
         type: "address",
       },
     ],
@@ -2570,14 +2681,14 @@ export const offsetHelperABI = [
         type: "address",
       },
       {
+        internalType: "address",
+        name: "_poolToken",
+        type: "address",
+      },
+      {
         internalType: "uint256",
         name: "_fromAmount",
         type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_toToken",
-        type: "address",
       },
     ],
     name: "swapExactInToken",
@@ -2595,7 +2706,12 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_fromToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_poolToken",
         type: "address",
       },
       {
@@ -2618,7 +2734,7 @@ export const offsetHelperABI = [
       },
       {
         internalType: "address",
-        name: "_toToken",
+        name: "_poolToken",
         type: "address",
       },
       {

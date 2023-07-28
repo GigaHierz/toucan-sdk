@@ -490,7 +490,7 @@ class ContractInteractions {
     await approveTxn.wait();
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetUsingToken(
+      await offsetHelper.autoOffsetExactOutToken(
         swapToken.address,
         poolAddress,
         amount,
@@ -527,8 +527,8 @@ class ContractInteractions {
     const offsetTxn: ContractTransaction =
       await offsetHelper.autoOffsetExactInToken(
         swapToken.address,
-        amount,
         poolAddress,
+        amount,
         { gasLimit: GAS_LIMIT }
       );
     return await offsetTxn.wait();
@@ -546,6 +546,7 @@ class ContractInteractions {
    */
   autoOffsetExactOutETH = async (
     pool: PoolSymbol,
+    swapToken: Contract,
     amount: BigNumber,
     signer: ethers.Signer
   ): Promise<ContractReceipt> => {
@@ -553,10 +554,19 @@ class ContractInteractions {
     const poolAddress = this.getPoolAddress(pool);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetExactOutETH(poolAddress, amount, {
-        gasLimit: GAS_LIMIT,
-        value: await offsetHelper.calculateNeededETHAmount(poolAddress, amount),
-      });
+      await offsetHelper.autoOffsetExactOutETH(
+        swapToken.address,
+        poolAddress,
+        amount,
+        {
+          gasLimit: GAS_LIMIT,
+          value: await offsetHelper.calculateNeededETHAmount(
+            swapToken.address,
+            poolAddress,
+            amount
+          ),
+        }
+      );
     return await offsetTxn.wait();
   };
 
@@ -571,6 +581,7 @@ class ContractInteractions {
    */
   autoOffsetExactInETH = async (
     pool: PoolSymbol,
+    swapToken: Contract,
     amount: BigNumber,
     signer: ethers.Signer
   ): Promise<ContractReceipt> => {
@@ -578,7 +589,7 @@ class ContractInteractions {
     const poolAddress = this.getPoolAddress(pool);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetExactInETH(poolAddress, amount, {
+      await offsetHelper.autoOffsetExactInETH(swapToken.address, poolAddress, {
         gasLimit: GAS_LIMIT,
         value: amount,
       });
@@ -617,12 +628,14 @@ class ContractInteractions {
    * @returns amount (BigNumber) of ETH needed to deposit; ETH = native currency of network you are on
    */
   calculateNeededETHAmount = async (
+    swapToken: string,
     pool: PoolSymbol,
     amount: BigNumber,
     signerOrProvider: ethers.Signer | ethers.providers.Provider
   ): Promise<BigNumber> => {
     const offsetHelper = this.getOffsetHelperContract(signerOrProvider);
     return await offsetHelper.calculateNeededETHAmount(
+      swapToken,
       this.getPoolAddress(pool),
       amount
     );
@@ -711,7 +724,7 @@ class ContractInteractions {
   public getOffsetHelperContract = (
     signerOrProvider: ethers.Signer | ethers.providers.Provider
   ): OffsetHelper => {
-    throw new Error("OffsetHelper is not supported yet");
+    // throw new Error("OffsetHelper is not supported yet");
     const OffsetHelper = new ethers.Contract(
       this.addresses.offsetHelper,
       offsetHelperABI,
