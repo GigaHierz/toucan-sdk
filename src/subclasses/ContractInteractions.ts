@@ -38,7 +38,7 @@ import {
   offsetHelperABI,
   toucanContractRegistryABI,
 } from "../utils/ABIs";
-import addresses, { IfcOneNetworksAddresses } from "../utils/addresses";
+import addresses, { IfcNetworkAddresses } from "../utils/addresses";
 
 /**
  * @class ContractInteractions
@@ -46,7 +46,7 @@ import addresses, { IfcOneNetworksAddresses } from "../utils/addresses";
  */
 class ContractInteractions {
   network: Network;
-  addresses: IfcOneNetworksAddresses;
+  addresses: IfcNetworkAddresses;
 
   /**
    *
@@ -484,7 +484,8 @@ class ContractInteractions {
       await offsetHelper.calculateNeededTokenAmount(
         swapToken.address,
         poolAddress,
-        amount
+        amount,
+        { gasLimit: GAS_LIMIT }
       )
     );
     await approveTxn.wait();

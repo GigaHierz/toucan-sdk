@@ -24,7 +24,7 @@ describe("Testing Toucan-SDK contract interactions", function () {
   const provider = new ethers.providers.JsonRpcProvider(
     "https://matic-mainnet.chainstacklabs.com"
   );
-  // change these three variables when testing the different networks
+  // change these two variables when testing the different networks
   const network = addresses.polygon;
   const networkName = "polygon";
 
@@ -151,7 +151,7 @@ describe("Testing Toucan-SDK contract interactions", function () {
         ONE_ETHER,
         weth
       );
-      await toucan.autoOffsetUsingSwapToken("NCT", ONE_ETHER, weth);
+      await toucan.autoOffsetExactInToken(network.weth, "NCT", ONE_ETHER);
 
       state.push({
         nctSupply: await pool.totalSupply(),
@@ -177,7 +177,11 @@ describe("Testing Toucan-SDK contract interactions", function () {
         nctSupply: await pool.totalSupply(),
       });
 
-      await toucan.autoOffsetUsingETH("NCT", ONE_ETHER);
+      await toucan.autoOffsetExactInETH(
+        "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        "NCT",
+        ONE_ETHER
+      );
 
       state.push({
         nctSupply: await pool.totalSupply(),

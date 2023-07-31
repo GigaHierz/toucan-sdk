@@ -222,7 +222,7 @@ You can use different tokens to do it. Currently it works with USDC, WMATIC and 
 ```typescript
 const weth = new ethers.Contract(wethAddress, wethAbi, signer);
 
-const offsetReceipt = await toucan.autoOffsetUsingSwapToken(
+const offsetReceipt = await toucan.autoOffsetUsingToken(
   "NCT",
   parseEther("1.0"),
   weth

@@ -21,42 +21,45 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SwapperInterface extends ethers.utils.Interface {
   functions: {
-    "calculateNeededETHAmount(address,uint256)": FunctionFragment;
-    "sushiRouterAddress()": FunctionFragment;
+    "calculateNeededTokenAmount(address,uint256)": FunctionFragment;
+    "dexRouterAddress()": FunctionFragment;
+    "eligibleSwapPaths(address,uint256)": FunctionFragment;
     "swap(address,uint256)": FunctionFragment;
-    "tokenAddresses(string)": FunctionFragment;
+    "swapToken()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "calculateNeededETHAmount",
+    functionFragment: "calculateNeededTokenAmount",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "sushiRouterAddress",
+    functionFragment: "dexRouterAddress",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eligibleSwapPaths",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "swap",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "tokenAddresses",
-    values: [string]
-  ): string;
+  encodeFunctionData(functionFragment: "swapToken", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "calculateNeededETHAmount",
+    functionFragment: "calculateNeededTokenAmount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "sushiRouterAddress",
+    functionFragment: "dexRouterAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "eligibleSwapPaths",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenAddresses",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "swapToken", data: BytesLike): Result;
 
   events: {};
 }
@@ -105,13 +108,19 @@ export class Swapper extends BaseContract {
   interface: SwapperInterface;
 
   functions: {
-    calculateNeededETHAmount(
+    calculateNeededTokenAmount(
       _toToken: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    sushiRouterAddress(overrides?: CallOverrides): Promise<[string]>;
+    dexRouterAddress(overrides?: CallOverrides): Promise<[string]>;
+
+    eligibleSwapPaths(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     swap(
       _toToken: string,
@@ -119,16 +128,22 @@ export class Swapper extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    tokenAddresses(arg0: string, overrides?: CallOverrides): Promise<[string]>;
+    swapToken(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  calculateNeededETHAmount(
+  calculateNeededTokenAmount(
     _toToken: string,
     _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  sushiRouterAddress(overrides?: CallOverrides): Promise<string>;
+  dexRouterAddress(overrides?: CallOverrides): Promise<string>;
+
+  eligibleSwapPaths(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   swap(
     _toToken: string,
@@ -136,16 +151,22 @@ export class Swapper extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  tokenAddresses(arg0: string, overrides?: CallOverrides): Promise<string>;
+  swapToken(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    calculateNeededETHAmount(
+    calculateNeededTokenAmount(
       _toToken: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sushiRouterAddress(overrides?: CallOverrides): Promise<string>;
+    dexRouterAddress(overrides?: CallOverrides): Promise<string>;
+
+    eligibleSwapPaths(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     swap(
       _toToken: string,
@@ -153,19 +174,25 @@ export class Swapper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    tokenAddresses(arg0: string, overrides?: CallOverrides): Promise<string>;
+    swapToken(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    calculateNeededETHAmount(
+    calculateNeededTokenAmount(
       _toToken: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sushiRouterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    dexRouterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    eligibleSwapPaths(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     swap(
       _toToken: string,
@@ -173,17 +200,21 @@ export class Swapper extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    tokenAddresses(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    swapToken(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    calculateNeededETHAmount(
+    calculateNeededTokenAmount(
       _toToken: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    sushiRouterAddress(
+    dexRouterAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    eligibleSwapPaths(
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -193,9 +224,6 @@ export class Swapper extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    tokenAddresses(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    swapToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

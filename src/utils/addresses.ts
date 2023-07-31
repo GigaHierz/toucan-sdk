@@ -1,4 +1,4 @@
-export interface IfcNetworksAddresses {
+export interface IfcNetworkAddresses {
   bct: string;
   nct: string;
   offsetHelper: string;
@@ -8,10 +8,10 @@ export interface IfcNetworksAddresses {
 }
 
 export interface IfcAddresses {
-  celo: IfcNetworksAddresses;
-  alfajores: IfcNetworksAddresses;
-  polygon: IfcNetworksAddresses;
-  mumbai: IfcNetworksAddresses;
+  celo: IfcNetworkAddresses;
+  alfajores: IfcNetworkAddresses;
+  polygon: IfcNetworkAddresses;
+  mumbai: IfcNetworkAddresses;
 }
 
 const addresses: IfcAddresses = {
