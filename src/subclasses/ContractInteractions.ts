@@ -547,7 +547,6 @@ class ContractInteractions {
    */
   autoOffsetExactOutETH = async (
     pool: PoolSymbol,
-    swapToken: Contract,
     amount: BigNumber,
     signer: ethers.Signer
   ): Promise<ContractReceipt> => {
@@ -555,19 +554,10 @@ class ContractInteractions {
     const poolAddress = this.getPoolAddress(pool);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetExactOutETH(
-        swapToken.address,
-        poolAddress,
-        amount,
-        {
-          gasLimit: GAS_LIMIT,
-          value: await offsetHelper.calculateNeededETHAmount(
-            swapToken.address,
-            poolAddress,
-            amount
-          ),
-        }
-      );
+      await offsetHelper.autoOffsetExactOutETH(poolAddress, amount, {
+        gasLimit: GAS_LIMIT,
+        value: await offsetHelper.calculateNeededETHAmount(poolAddress, amount),
+      });
     return await offsetTxn.wait();
   };
 
@@ -582,7 +572,6 @@ class ContractInteractions {
    */
   autoOffsetExactInETH = async (
     pool: PoolSymbol,
-    swapToken: Contract,
     amount: BigNumber,
     signer: ethers.Signer
   ): Promise<ContractReceipt> => {
@@ -590,7 +579,7 @@ class ContractInteractions {
     const poolAddress = this.getPoolAddress(pool);
 
     const offsetTxn: ContractTransaction =
-      await offsetHelper.autoOffsetExactInETH(swapToken.address, poolAddress, {
+      await offsetHelper.autoOffsetExactInETH(poolAddress, {
         gasLimit: GAS_LIMIT,
         value: amount,
       });
@@ -629,14 +618,12 @@ class ContractInteractions {
    * @returns amount (BigNumber) of ETH needed to deposit; ETH = native currency of network you are on
    */
   calculateNeededETHAmount = async (
-    swapToken: string,
     pool: PoolSymbol,
     amount: BigNumber,
     signerOrProvider: ethers.Signer | ethers.providers.Provider
   ): Promise<BigNumber> => {
     const offsetHelper = this.getOffsetHelperContract(signerOrProvider);
     return await offsetHelper.calculateNeededETHAmount(
-      swapToken,
       this.getPoolAddress(pool),
       amount
     );

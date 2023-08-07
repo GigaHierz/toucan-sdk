@@ -22,7 +22,7 @@ describe("Testing Toucan-SDK contract interactions", function () {
   let toucan: ToucanClient;
   let swapper: Contract;
   const provider = new ethers.providers.JsonRpcProvider(
-    "https://matic-mainnet.chainstacklabs.com"
+    "https://rpc.ankr.com/polygon"
   );
   // change these two variables when testing the different networks
   const network = addresses.polygon;
@@ -86,27 +86,37 @@ describe("Testing Toucan-SDK contract interactions", function () {
     toucan.setProvider(provider);
     toucan.setSigner(addr1);
 
+    console.log(network.nct);
+    console.log(parseEther("100.0"));
+
     swapper = new ethers.Contract(network.swapper, swapperABI, addr1);
+    console.log(
+      await swapper.calculateNeededTokenAmount(network.nct, parseEther("100.0"))
+    );
+
     await swapper.swap(network.nct, parseEther("100.0"), {
-      value: await swapper.calculateNeededETHAmount(
+      value: await swapper.calculateNeededTokenAmount(
         network.nct,
         parseEther("100.0")
       ),
     });
     await swapper.swap(network.bct, parseEther("100.0"), {
-      value: await swapper.calculateNeededETHAmount(
+      value: await swapper.calculateNeededTokenAmount(
         network.bct,
         parseEther("100.0")
       ),
     });
     await swapper.swap(network.weth, ONE_ETHER, {
-      value: await swapper.calculateNeededETHAmount(network.weth, ONE_ETHER),
+      value: await swapper.calculateNeededTokenAmount(network.weth, ONE_ETHER),
     });
   });
 
-  describe.skip("Testing OffsetHelper related methods", function () {
+  describe.only("Testing OffsetHelper related methods", function () {
     it("Should retire 1 TCO2 using pool token deposit", async function () {
+      console.log("first test");
+
       const pool = await toucan.getPoolContract("NCT");
+      console.log("first test2");
 
       const state: any[] = [];
       state.push({
@@ -114,7 +124,10 @@ describe("Testing Toucan-SDK contract interactions", function () {
         nctBalance: await pool.balanceOf(addr1.address),
       });
 
+      console.log("first test3");
+
       await toucan.autoOffsetUsingPoolToken("NCT", ONE_ETHER);
+      console.log("first test4");
 
       state.push({
         nctSupply: await pool.totalSupply(),
@@ -178,7 +191,6 @@ describe("Testing Toucan-SDK contract interactions", function () {
       });
 
       await toucan.autoOffsetExactInETH(
-        "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
         "NCT",
         ONE_ETHER
       );

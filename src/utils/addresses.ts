@@ -20,7 +20,7 @@ const addresses: IfcAddresses = {
     nct: "0x02De4766C272abc10Bc88c220D214A26960a7e92",
     offsetHelper: "0x9032d9D5Bc552427a698cDb021E6d1DfbbEd3e30",
     weth: "0x122013fd7dF1C6F636a5bb8f03108E876548b455",
-    swapper: "",
+    swapper: "0x7B99c68012F78f9D15BA9EA4121aB3e09914Be70",
     toucanContractRegistry: "0xa30589F50b9641dacCB98AA2B4A8F24739c5B007",
   },
   alfajores: {
@@ -35,7 +35,7 @@ const addresses: IfcAddresses = {
     bct: "0x2f800db0fdb5223b3c3f354886d907a671414a7f",
     nct: "0xd838290e877e0188a4a44700463419ed96c16107",
     offsetHelper: "0xbA4fD6aC755E3D4C0d39103b796e35117459dB19",
-    swapper: "0x1C7f2CCa1Cd52Aae8A25B7BA4b7800c153F48D70",
+    swapper: "0x68DF99A11BD292cB91d3Fb07272062eF339d6dc1",
     weth: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
     toucanContractRegistry: "0x263fa1c180889b3a3f46330f32a4a23287e99fc9",
   },

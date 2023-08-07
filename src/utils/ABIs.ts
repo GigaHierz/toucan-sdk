@@ -2129,11 +2129,6 @@ export const offsetHelperABI = [
     inputs: [
       {
         internalType: "address",
-        name: "_fromToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
         name: "_poolToken",
         type: "address",
       },
@@ -2416,11 +2411,6 @@ export const offsetHelperABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_fromToken",
-        type: "address",
-      },
       {
         internalType: "address",
         name: "_poolToken",
@@ -2788,34 +2778,97 @@ export const offsetHelperABI = [
 export const swapperABI = [
   {
     inputs: [
-      { internalType: "string[]", name: "_tokenSymbols", type: "string[]" },
-      { internalType: "address[]", name: "_tokenAddresses", type: "address[]" },
+      {
+        internalType: "address[][]",
+        name: "_paths",
+        type: "address[][]",
+      },
+      {
+        internalType: "address",
+        name: "_swapToken",
+        type: "address",
+      },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
   },
-  { stateMutability: "payable", type: "fallback" },
+  {
+    stateMutability: "payable",
+    type: "fallback",
+  },
   {
     inputs: [
-      { internalType: "address", name: "_toToken", type: "address" },
-      { internalType: "uint256", name: "_amount", type: "uint256" },
+      {
+        internalType: "address",
+        name: "_toToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
     ],
-    name: "calculateNeededETHAmount",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "calculateNeededTokenAmount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "sushiRouterAddress",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "dexRouterAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "_toToken", type: "address" },
-      { internalType: "uint256", name: "_amount", type: "uint256" },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "eligibleSwapPaths",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_toToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
     ],
     name: "swap",
     outputs: [],
@@ -2823,13 +2876,22 @@ export const swapperABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "", type: "string" }],
-    name: "tokenAddresses",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    inputs: [],
+    name: "swapToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
-  { stateMutability: "payable", type: "receive" },
+  {
+    stateMutability: "payable",
+    type: "receive",
+  },
 ];
 
 export const tco2ABI = [
